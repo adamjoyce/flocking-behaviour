@@ -3,18 +3,14 @@ using System.Collections;
 
 public class AgentConfig : MonoBehaviour
 {
-    private float maxVelocity;
-    private float maxAcceleration;
+    public float Rc;
+    public float Rs;
+    public float Ra;
 
-    // Use this for initialization.
-    void Start()
-    {
+    public float Kc;
+    public float Ks;
+    public float Ka;
 
-    }
-
-    // Update is called once per frame.
-    void Update()
-    {
-
-    }
+    public float maxAcceleration = 10.0f;
+    public float maxVelocity = 10.0f;
 }
