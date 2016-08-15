@@ -23,18 +23,25 @@ public class World : MonoBehaviour
 
     }
 
+    // Returns the neighbours of agent inside radius.
+    public List<Agent> getNeighbours(Agent agent, float radius)
+    {
+        List<Agent> neighbourAgents = new List<Agent>();
+        for (int i = 0; i < agents.Count; i++)
+        {
+            if (agents[i] != agent && Vector3.Distance(agent.position, agents[i].position) <= radius)
+                neighbourAgents.Add(agents[i]);
+        }
+
+        return neighbourAgents;
+    }
+
     // Randomly spawns a number of agents in the scene.
     private void spawnAgents(Transform prefab, int agentNumber)
     {
         for (int i = 0; i < agentNumber; i++)
         {
-            var obj = Instantiate(prefab, new Vector3(Random.Range(-10.0f, 10.0f), 0, Random.Range(-10.0f, 10.0f)), Quaternion.identity);
+            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-10.0f, 10.0f), 0, Random.Range(-10.0f, 10.0f)), Quaternion.identity) as GameObject;
         }
-    }
-
-    // Returns the neighbours of agent inside radius.
-    private List<Agent> getNeighbours(Agent agent, float radius)
-    {
-        return null;
     }
 }

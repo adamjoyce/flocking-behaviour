@@ -3,13 +3,13 @@ using System.Collections;
 
 public class AgentConfig : MonoBehaviour
 {
-    public float Rc;
-    public float Rs;
-    public float Ra;
+    public float cohesionRadius;
+    public float seperationRadius;
+    public float alignmentRadius;
 
-    public float Kc;
-    public float Ks;
-    public float Ka;
+    public float cohesionCoeff;
+    public float seperationCoeff;
+    public float alignmentCoeff;
 
     public float maxAcceleration = 10.0f;
     public float maxVelocity = 10.0f;
