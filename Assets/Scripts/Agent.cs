@@ -99,7 +99,7 @@ public class Agent : MonoBehaviour
             }
         }
 
-        return resultantVector;
+        return resultantVector.normalized;
     }
 
     // Steers the agent to match the velocity of its neighbours.
