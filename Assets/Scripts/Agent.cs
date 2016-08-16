@@ -16,7 +16,7 @@ public class Agent : MonoBehaviour
         world = FindObjectOfType<World>();
         config = FindObjectOfType<AgentConfig>();
         position = transform.position;
-        velocity = new Vector3(Random.Range(-3.0f, 3.0f), 0, Random.Range(-3.0f, 3.0f));
+        velocity = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
     }
 
     // Update is called once per frame.

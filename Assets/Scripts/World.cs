@@ -45,7 +45,7 @@ public class World : MonoBehaviour
     {
         for (int i = 0; i < agentNumber; i++)
         {
-            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), 0, Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
+            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
         }
     }
 }
