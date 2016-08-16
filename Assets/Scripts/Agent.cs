@@ -43,6 +43,7 @@ public class Agent : MonoBehaviour
     private Vector3 cohesionBehaviour()
     {
         Vector3 resultantVector = new Vector3();
+        int agentsCount = 0;
 
         // Get all nearby neighbours.
         List<Agent> neighbours = world.getNeighbours(this, config.cohesionRadius);
@@ -54,9 +55,18 @@ public class Agent : MonoBehaviour
         // Find the centre of mass of all neighbours.
         for (int i = 0; i < neighbours.Count; i++)
         {
-            resultantVector += neighbours[i].position;
+            if (inFieldOfVision(neighbours[i].position))
+            {
+                resultantVector += neighbours[i].position;
+                agentsCount++;
+            }
         }
-        resultantVector /= neighbours.Count;
+
+        // No neighbours in field of view.
+        if (agentsCount == 0)
+            return resultantVector;
+
+        resultantVector /= agentsCount;
 
         // Vector towards centre of mass and normalise.
         resultantVector = resultantVector - position;
@@ -79,11 +89,14 @@ public class Agent : MonoBehaviour
         // Add the contribution from each neighbour towards this agent.
         for (int i = 0; i < neighbours.Count; i++)
         {
-            Vector3 towardsAgent = position - neighbours[i].position;
+            if (inFieldOfVision(neighbours[i].position))
+            {
+                Vector3 towardsAgent = position - neighbours[i].position;
 
-            // The force contribution will vary inversely to the distance.
-            if (towardsAgent.magnitude > 0)
-                resultantVector += towardsAgent.normalized / towardsAgent.magnitude;
+                // The force contribution will vary inversely to the distance.
+                if (towardsAgent.magnitude > 0)
+                    resultantVector += towardsAgent.normalized / towardsAgent.magnitude;
+            }
         }
 
         return resultantVector;
@@ -103,7 +116,8 @@ public class Agent : MonoBehaviour
 
         // Match veloicty of all nearby neighbours.
         for (int i = 0; i < neighbours.Count; i++)
-            resultantVector += neighbours[i].velocity;
+            if (inFieldOfVision(neighbours[i].position))
+                resultantVector += neighbours[i].velocity;
 
         return resultantVector.normalized;
     }
@@ -140,5 +154,11 @@ public class Agent : MonoBehaviour
         else if (value < min)
             value = max;
         return value;
+    }
+
+    // Determines if a given neighbour is within the agent's field of vision.
+    private bool inFieldOfVision(Vector3 neighbourPosition)
+    {
+        return Vector3.Angle(velocity, neighbourPosition - position) <= config.maxFieldOfViewAngle;
     }
 }

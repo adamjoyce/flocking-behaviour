@@ -13,4 +13,6 @@ public class AgentConfig : MonoBehaviour
 
     public float maxAcceleration = 10.0f;
     public float maxVelocity = 10.0f;
+
+    public float maxFieldOfViewAngle = 180.0f;
 }
