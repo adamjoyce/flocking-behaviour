@@ -9,16 +9,18 @@ public class World : MonoBehaviour
     public float bound;
     public float spawnRadius;
 
-
     private List<Agent> agents;
+    private List<Predator> predators;
 
     // Use this for initialization.
     void Start()
     {
         agents = new List<Agent>();
-        spawnAgents(agentPrefab, numberOfAgents);
+        predators = new List<Predator>();
 
+        spawnAgents(agentPrefab, numberOfAgents);
         agents.AddRange(FindObjectsOfType<Agent>());
+        predators.AddRange(FindObjectsOfType<Predator>());
     }
 
     // Update is called once per frame.
@@ -40,12 +42,25 @@ public class World : MonoBehaviour
         return neighbourAgents;
     }
 
+    // Returns the preadtors inside the radius.
+    public List<Predator> getPredators(Agent agent, float radius)
+    {
+        List<Predator> predatorAgents = new List<Predator>();
+        for (int i = 0; i < predators.Count; i++)
+        {
+            if (Vector3.Distance(agent.position, predators[i].position) <= radius)
+                predatorAgents.Add(predators[i]);
+        }
+
+        return predatorAgents;
+    }
+
     // Randomly spawns a number of agents in the scene.
     private void spawnAgents(Transform prefab, int agentNumber)
     {
         for (int i = 0; i < agentNumber; i++)
         {
-            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius), Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
+            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), /*Random.Range(-spawnRadius, spawnRadius)*/0, Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
         }
     }
 }

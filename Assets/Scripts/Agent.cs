@@ -10,13 +10,15 @@ public class Agent : MonoBehaviour
     public World world;
     public AgentConfig config;
 
+    private Vector3 wanderTarget;
+
     // Use this for initialization.
     void Start()
     {
         world = FindObjectOfType<World>();
         config = FindObjectOfType<AgentConfig>();
         position = transform.position;
-        velocity = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
+        velocity = new Vector3(Random.Range(-3.0f, 3.0f), /*Random.Range(-3.0f, 3.0f)*/0, Random.Range(-3.0f, 3.0f));
     }
 
     // Update is called once per frame.
@@ -123,7 +125,7 @@ public class Agent : MonoBehaviour
     }
 
     // Combines all behaviours according to their wieghtings.
-    private Vector3 combineBehaviours()
+    protected virtual Vector3 combineBehaviours()
     {
         Vector3 resultantAccelreation = new Vector3();
 
@@ -133,7 +135,8 @@ public class Agent : MonoBehaviour
         Vector3 alignmentDesire = alignmentBehaviour();
 
         // Combine all desire vectors with their associated weightings.
-        resultantAccelreation = config.cohesionCoeff * cohesionDesire + config.seperationCoeff * seperationbDesire + config.alignmentCoeff * alignmentDesire;
+        resultantAccelreation = config.cohesionCoeff * cohesionDesire + config.seperationCoeff * seperationbDesire + config.alignmentCoeff * alignmentDesire + 
+                                config.wanderCoeff * wanderBehaviour() + config.avoidCoeff * avoidPredators();
 
         return resultantAccelreation;
     }
@@ -160,5 +163,65 @@ public class Agent : MonoBehaviour
     private bool inFieldOfVision(Vector3 neighbourPosition)
     {
         return Vector3.Angle(velocity, neighbourPosition - position) <= config.maxFieldOfViewAngle;
+    }
+
+    // Steers the agent towards a random wander target location.
+    protected Vector3 wanderBehaviour()
+    {
+        float jitter = config.wanderJitter * Time.deltaTime;
+
+        // Random direction vector deviation for target position.
+        wanderTarget += new Vector3(randomBinomial() * jitter, 0, randomBinomial() * jitter);
+
+        // Project the vector back to the unit 'wander' circle.
+        wanderTarget = wanderTarget.normalized;
+
+        // Makes the length the same as the wander circle's radius.
+        wanderTarget *= config.wanderRadius;
+
+        // Position the target circle in front of agent.
+        Vector3 targetInLocalSpace = wanderTarget + new Vector3(0, 0, config.wanderDistance);
+
+        // Project the target circle from local space to world space.
+        Vector3 targetInWorldSpace = transform.TransformPoint(targetInLocalSpace);
+
+        // Steer agent towards target on circle.
+        targetInWorldSpace -= position;
+
+        return targetInWorldSpace.normalized;
+    }
+
+    // Generates a random number between -1.0f and 1.0f with a greater chance of the result being closer to 0.0f that the extremities.
+    private float randomBinomial()
+    {
+        return Random.Range(0.0f, 1.0f) - Random.Range(0.0f, 1.0f);
+    }
+
+    // Makes the agent flee from nearby enemies.
+    private Vector3 avoidPredators()
+    {
+        Vector3 resultantVector = new Vector3();
+
+        // Get all enemies.
+        List<Predator> predators = world.getPredators(this, config.avoidRadius);
+
+        // Zero predators means no need to flee.
+        if (predators.Count == 0)
+            return resultantVector;
+
+        // Flee from the predators.
+        for (int i = 0; i < predators.Count; i++)
+        {
+            resultantVector += flee(predators[i].position);
+        }
+
+        return resultantVector.normalized;
+    }
+
+    // Run in the opposite direction of the target.
+    private Vector3 flee(Vector3 targetPosition)
+    {
+        Vector3 desiredVelocity = (position - targetPosition).normalized * config.maxVelocity;
+        return desiredVelocity - velocity;
     }
 }
