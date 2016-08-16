@@ -23,7 +23,7 @@ public class Agent : MonoBehaviour
     {
         float time = Time.deltaTime;
 
-        acceleration = cohesionBehaviour();//combineBehaviours();
+        acceleration =10 * seperationBehaviour();//combineBehaviours();
         acceleration = Vector3.ClampMagnitude(acceleration, config.maxAcceleration);
 
         velocity += acceleration * time;
@@ -41,7 +41,7 @@ public class Agent : MonoBehaviour
         // Get all nearby neighbours.
         List<Agent> neighbours = world.getNeighbours(this, config.cohesionRadius);
 
-        // Zero neighbours means no cohesion desire.
+        // Zero neighbours results in no cohesion desire.
         if (neighbours.Count == 0)
             return resultantVector;
 
@@ -59,10 +59,29 @@ public class Agent : MonoBehaviour
         return resultantVector;
     }
 
-    // Seperation behaviour.
+    // Steers the agent in the opposite direction from each of its neighbours.
     private Vector3 seperationBehaviour()
     {
-        return Vector3.zero;
+        Vector3 resultantVector = new Vector3();
+
+        // Get all nearby neighbours.
+        List<Agent> neighbours = world.getNeighbours(this, config.seperationRadius);
+
+        // Zero neighbours results in no seperation desire.
+        if (neighbours.Count == 0)
+            return resultantVector;
+
+        // Add the contribution from each neighbour towards this agent.
+        for (int i = 0; i < neighbours.Count; i++)
+        {
+            Vector3 towardsAgent = position - neighbours[i].position;
+
+            // The force contribution will vary inversely to the distance.
+            if (towardsAgent.magnitude > 0)
+                resultantVector += towardsAgent.normalized / towardsAgent.magnitude;
+        }
+
+        return resultantVector;
     }
 
     // Alignment behaviour.
