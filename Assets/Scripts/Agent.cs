@@ -31,6 +31,9 @@ public class Agent : MonoBehaviour
 
         position += velocity * time;
         transform.position = position;
+
+        if (velocity.magnitude > 0)
+            transform.LookAt(position + velocity);
     }
 
     // Steers the agent's current velocity towards the centre of mass of all nearby neighbours.
@@ -54,7 +57,7 @@ public class Agent : MonoBehaviour
 
         // Vector towards centre of mass and normalise.
         resultantVector = resultantVector - position;
-        Vector3.Normalize(resultantVector);
+        resultantVector = resultantVector.normalized;
 
         return resultantVector;
     }
@@ -84,10 +87,25 @@ public class Agent : MonoBehaviour
         return resultantVector;
     }
 
-    // Alignment behaviour.
+    // Steers the agent to match the velocity of its neighbours.
     private Vector3 alignmentBehaviour()
     {
-        return Vector3.zero;
+        Vector3 resultantVector = new Vector3();
+
+        // Get all nearby neighbours.
+        List<Agent> neighbours = world.getNeighbours(this, config.alignmentRadius);
+
+        // Zero neighbours results in no alignement desire.
+        if (neighbours.Count == 0)
+            return resultantVector;
+
+        // Match veloicty of all nearby neighbours.
+        for (int i = 0; i < neighbours.Count; i++)
+            resultantVector += neighbours[i].position;
+
+        resultantVector = resultantVector.normalized;
+
+        return resultantVector;
     }
 
     // Combines all behaviours.
