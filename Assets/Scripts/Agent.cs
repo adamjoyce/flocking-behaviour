@@ -16,6 +16,7 @@ public class Agent : MonoBehaviour
         world = FindObjectOfType<World>();
         config = FindObjectOfType<AgentConfig>();
         position = transform.position;
+        velocity = new Vector3(Random.Range(-3.0f, 3.0f), 0, Random.Range(-3.0f, 3.0f));
     }
 
     // Update is called once per frame.
@@ -23,7 +24,7 @@ public class Agent : MonoBehaviour
     {
         float time = Time.deltaTime;
 
-        acceleration =10 * seperationBehaviour();//combineBehaviours();
+        acceleration = alignmentBehaviour();//combineBehaviours();
         acceleration = Vector3.ClampMagnitude(acceleration, config.maxAcceleration);
 
         velocity += acceleration * time;
@@ -57,9 +58,8 @@ public class Agent : MonoBehaviour
 
         // Vector towards centre of mass and normalise.
         resultantVector = resultantVector - position;
-        resultantVector = resultantVector.normalized;
 
-        return resultantVector;
+        return resultantVector.normalized;
     }
 
     // Steers the agent in the opposite direction from each of its neighbours.
@@ -101,11 +101,9 @@ public class Agent : MonoBehaviour
 
         // Match veloicty of all nearby neighbours.
         for (int i = 0; i < neighbours.Count; i++)
-            resultantVector += neighbours[i].position;
+            resultantVector += neighbours[i].velocity;
 
-        resultantVector = resultantVector.normalized;
-
-        return resultantVector;
+        return resultantVector.normalized;
     }
 
     // Combines all behaviours.
