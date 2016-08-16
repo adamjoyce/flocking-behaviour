@@ -24,13 +24,15 @@ public class Agent : MonoBehaviour
     {
         float time = Time.deltaTime;
 
-        acceleration = alignmentBehaviour();//combineBehaviours();
+        acceleration = combineBehaviours();
         acceleration = Vector3.ClampMagnitude(acceleration, config.maxAcceleration);
 
         velocity += acceleration * time;
         velocity = Vector3.ClampMagnitude(velocity, config.maxVelocity);
 
         position += velocity * time;
+
+        wrapAround(ref position, -world.bound, world.bound);
         transform.position = position;
 
         if (velocity.magnitude > 0)
@@ -106,9 +108,37 @@ public class Agent : MonoBehaviour
         return resultantVector.normalized;
     }
 
-    // Combines all behaviours.
+    // Combines all behaviours according to their wieghtings.
     private Vector3 combineBehaviours()
     {
-        return Vector3.zero;
+        Vector3 resultantAccelreation = new Vector3();
+
+        // Cohesion, seperation, and alignement normalised desire vectors.
+        Vector3 cohesionDesire = cohesionBehaviour();
+        Vector3 seperationbDesire = seperationBehaviour();
+        Vector3 alignmentDesire = alignmentBehaviour();
+
+        // Combine all desire vectors with their associated weightings.
+        resultantAccelreation = config.cohesionCoeff * cohesionDesire + config.seperationCoeff * seperationbDesire + config.alignmentCoeff * alignmentDesire;
+
+        return resultantAccelreation;
+    }
+
+    // Wraps around the given position to keep it within the min - max range.
+    private void wrapAround(ref Vector3 position, float min, float max)
+    {
+        position.x = wrapAroundFloat(position.x, min, max);
+        position.y = wrapAroundFloat(position.y, min, max);
+        position.z = wrapAroundFloat(position.z, min, max);
+    }
+
+    // Bounds value within the min - max range.
+    private float wrapAroundFloat(float value, float min, float max)
+    {
+        if (value > max)
+            value = min;
+        else if (value < min)
+            value = max;
+        return value;
     }
 }

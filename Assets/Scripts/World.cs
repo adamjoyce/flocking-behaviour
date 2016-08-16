@@ -6,6 +6,10 @@ public class World : MonoBehaviour
 {
     public Transform agentPrefab;
     public int numberOfAgents;
+    public float bound;
+    public float spawnRadius;
+
+
     private List<Agent> agents;
 
     // Use this for initialization.
