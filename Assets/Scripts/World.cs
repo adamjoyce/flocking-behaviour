@@ -7,14 +7,19 @@ public class World : MonoBehaviour
     public Transform agentPrefab;
     public int numberOfAgents;
     public float bound;
+    public int numberOfSubdivision;
     public float spawnRadius;
 
+    public List<int>[] bins;
     private List<Agent> agents;
     private List<Predator> predators;
 
     // Use this for initialization.
     void Start()
     {
+        // Build bins.
+        buildWorldBins();
+
         agents = new List<Agent>();
         predators = new List<Predator>();
 
@@ -55,6 +60,18 @@ public class World : MonoBehaviour
         return predatorAgents;
     }
 
+    // Sets up the world bins. Turn into 3D array dumbdumb.
+    private void buildWorldBins()
+    {
+        bins = new List<int>[numberOfSubdivision];
+        for (int row = 0; row < bins.Length; row++)
+        {
+            List<int> columns = new List<int>(numberOfSubdivision);
+            bins[row] = columns;
+            Debug.Log(bins[row] + "Size: " + bins[row].Count);
+        }
+    }
+
     // Randomly spawns a number of agents in the scene.
     private void spawnAgents(Transform prefab, int agentNumber)
     {
@@ -63,4 +80,6 @@ public class World : MonoBehaviour
             GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), /*Random.Range(-spawnRadius, spawnRadius)*/0, Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
         }
     }
+
+
 }
