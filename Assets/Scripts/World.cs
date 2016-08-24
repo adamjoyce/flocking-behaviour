@@ -40,24 +40,32 @@ public class World : MonoBehaviour
     public List<Agent> getNeighbours(Agent agent, float radius)
     {
         List<Agent> neighbourAgents = new List<Agent>();
-        List<Vector3> neighbourBins = getAdjacentBins(agent.binLocation);
-
-        for (int i = 0; i < neighbourBins.Count; i++)
+        List<Agent> neighbours = new List<Agent>(bins[(int)agent.binLocation.x, (int)agent.binLocation.z]);
+        for (int i = 0; i < neighbours.Count; i++)
         {
-            List<Agent> neighbours = new List<Agent>(bins[(int)neighbourBins[i].x, (int)neighbourBins[i].z]);
-            //for (int j = 0; j < neighbours.Count; j++)
-            //{
-            //    neighbourAgents.Add(neighbours[j]);
-            //}
+            if (neighbours[i] != agent && Vector3.Distance(agent.position, neighbours[i].position) <= radius)
+                neighbourAgents.Add(neighbours[i]);
         }
 
-        //for (int i = 0; i < agents.Count; i++)
-        //{
-        //    if (agents[i] != agent && Vector3.Distance(agent.position, agents[i].position) <= radius)
-        //        neighbourAgents.Add(agents[i]);
-        //}
 
-        return neighbourAgents;
+            //List<Vector3> neighbourBins = getAdjacentBins(agent.binLocation);
+
+            //for (int i = 0; i < neighbourBins.Count; i++)
+            //{
+            //    List<Agent> neighbours = new List<Agent>(bins[(int)neighbourBins[i].x, (int)neighbourBins[i].z]);
+            //    for (int j = 0; j < neighbours.Count; j++)
+            //    {
+            //        neighbourAgents.Add(neighbours[j]);
+            //    }
+            //}
+
+            //for (int i = 0; i < agents.Count; i++)
+            //{
+            //    if (agents[i] != agent && Vector3.Distance(agent.position, agents[i].position) <= radius)
+            //        neighbourAgents.Add(agents[i]);
+            //}
+
+            return neighbourAgents;
     }
 
     // Returns the preadtors inside the radius.
@@ -77,33 +85,34 @@ public class World : MonoBehaviour
     public List<Vector3> getAdjacentBins(Vector3 centralBin)
     {
         List<Vector3> resultantBins = new List<Vector3>();
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dz = -1; dz <= 1; dz++)
-            {
-                int x = (int)centralBin.x + dx;
-                int z = (int)centralBin.z + dz;
+        //for (int dx = -1; dx <= 1; dx++)
+        //{
+        //    for (int dz = -1; dz <= 1; dz++)
+        //    {
+        //        int x = (int)centralBin.x + dx;
+        //        int z = (int)centralBin.z + dz;
 
-                // Wrap around.
-                if (x == numberOfSubdivision)
-                    x = 0;
-                else if (x < 0)
-                    x = numberOfSubdivision - 1;
+        //        // Wrap around.
+        //        if (x == numberOfSubdivision)
+        //            x = 0;
+        //        else if (x < 0)
+        //            x = numberOfSubdivision - 1;
 
-                //if (y == numberOfSubdivision)
-                //    y = 0;
-                //else if (y < 0)
-                //    y = numberOfSubdivision - 1;
+        //        //if (y == numberOfSubdivision)
+        //        //    y = 0;
+        //        //else if (y < 0)
+        //        //    y = numberOfSubdivision - 1;
 
-                if (z == numberOfSubdivision)
-                    z = 0;
-                else if (z < 0)
-                    z = numberOfSubdivision - 1;
+        //        if (z == numberOfSubdivision)
+        //            z = 0;
+        //        else if (z < 0)
+        //            z = numberOfSubdivision - 1;
 
-                resultantBins.Add(new Vector3(x, 0, z));
-            }
-        }
+        //        resultantBins.Add(new Vector3(x, 0, z));
+        //    }
+        //}
 
+        resultantBins.Add(centralBin);
         return resultantBins;
     }
 
