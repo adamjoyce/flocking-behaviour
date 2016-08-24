@@ -26,6 +26,7 @@ public class Agent : MonoBehaviour
             velocity = new Vector3(Random.Range(-3.0f, 3.0f), 0, Random.Range(-3.0f, 3.0f));
 
         binLocation = world.determineAgentBin(this);
+        world.addAgentToBin(this, binLocation);
     }
 
     // Update is called once per frame.
@@ -46,6 +47,16 @@ public class Agent : MonoBehaviour
 
         if (velocity.magnitude > 0)
             transform.LookAt(position + velocity);
+
+        if (binLocation != world.determineAgentBin(this))
+        {
+            // Remove agent from old bin.
+            world.removeAgentFromBin(this, binLocation);
+
+            // Update the agent's bin.
+            binLocation = world.determineAgentBin(this);
+            world.addAgentToBin(this, binLocation);
+        }
     }
 
     // Steers the agent's current velocity towards the centre of mass of all nearby neighbours.
