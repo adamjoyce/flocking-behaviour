@@ -7,6 +7,7 @@ public class Agent : MonoBehaviour
     public Vector3 position;
     public Vector3 velocity;
     public Vector3 acceleration;
+    public Vector3 binLocation;
     public World world;
     public AgentConfig config;
 
@@ -18,7 +19,13 @@ public class Agent : MonoBehaviour
         world = FindObjectOfType<World>();
         config = FindObjectOfType<AgentConfig>();
         position = transform.position;
-        velocity = new Vector3(Random.Range(-3.0f, 3.0f), /*Random.Range(-3.0f, 3.0f)*/0, Random.Range(-3.0f, 3.0f));
+
+        if (world.threeDimensions)
+            velocity = new Vector3(Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f), Random.Range(-3.0f, 3.0f));
+        else
+            velocity = new Vector3(Random.Range(-3.0f, 3.0f), 0, Random.Range(-3.0f, 3.0f));
+
+        binLocation = world.determineAgentBin(this);
     }
 
     // Update is called once per frame.
@@ -34,7 +41,7 @@ public class Agent : MonoBehaviour
 
         position += velocity * time;
 
-        wrapAround(ref position, -world.bound, world.bound);
+        wrapAround(ref position, 0, world.bound * 2);
         transform.position = position;
 
         if (velocity.magnitude > 0)

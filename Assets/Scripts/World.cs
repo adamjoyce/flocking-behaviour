@@ -10,7 +10,9 @@ public class World : MonoBehaviour
     public int numberOfSubdivision;
     public float spawnRadius;
 
-    public List<int>[] bins;
+    public bool threeDimensions = false;
+
+    public List<Agent>[,] bins;
     private List<Agent> agents;
     private List<Predator> predators;
 
@@ -60,15 +62,32 @@ public class World : MonoBehaviour
         return predatorAgents;
     }
 
-    // Sets up the world bins. Turn into 3D array dumbdumb.
+    // Returns the bin location for the agent given.
+    public Vector3 determineAgentBin(Agent agent)
+    {
+        float binSize = (bound * 2) / numberOfSubdivision;
+        int binX = (int)Mathf.Floor(agent.position.x / binSize);
+        int binZ = (int)Mathf.Floor(agent.position.z / binSize);
+
+        int binY;
+        if (threeDimensions)
+            binY = (int)Mathf.Floor(agent.position.y / binSize);
+        else
+            binY = 0;
+
+        return new Vector3(binX, binY, binZ);
+    }
+
+    // Sets up the world bins.
     private void buildWorldBins()
     {
-        bins = new List<int>[numberOfSubdivision];
-        for (int row = 0; row < bins.Length; row++)
+        bins = new List<Agent>[numberOfSubdivision, numberOfSubdivision];
+        for (int i = 0; i < numberOfSubdivision; i++)
         {
-            List<int> columns = new List<int>(numberOfSubdivision);
-            bins[row] = columns;
-            Debug.Log(bins[row] + "Size: " + bins[row].Count);
+            for (int j = 0; j < numberOfSubdivision; j++)
+            {
+                bins[i, j] = new List<Agent>();
+            }
         }
     }
 
@@ -77,9 +96,14 @@ public class World : MonoBehaviour
     {
         for (int i = 0; i < agentNumber; i++)
         {
-            GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius, spawnRadius), /*Random.Range(-spawnRadius, spawnRadius)*/0, Random.Range(-spawnRadius, spawnRadius)), Quaternion.identity) as GameObject;
+            if (threeDimensions)
+            {
+                GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius + bound, spawnRadius + bound), Random.Range(-spawnRadius + bound, spawnRadius + bound), Random.Range(-spawnRadius + bound, spawnRadius + bound)), Quaternion.identity) as GameObject;
+            } 
+            else
+            {
+                GameObject agent = Instantiate(prefab, new Vector3(Random.Range(-spawnRadius + bound, spawnRadius + bound), 0, Random.Range(-spawnRadius + bound, spawnRadius + bound)), Quaternion.identity) as GameObject;
+            }
         }
     }
-
-
 }
